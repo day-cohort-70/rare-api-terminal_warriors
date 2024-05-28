@@ -8,7 +8,7 @@ CREATE TABLE "Users" (
   "password" varchar,
   "profile_image_url" varchar,
   "created_on" date,
-  "active" bit
+  "active" boolean
 );
 
 CREATE TABLE "DemotionQueue" (
@@ -38,8 +38,8 @@ CREATE TABLE "Posts" (
   "publication_date" date,
   "image_url" varchar,
   "content" varchar,
-  "approved" bit,
-  FOREIGN KEY(`user_id`) REFERENCES `Users`(`id`),
+  "approved" boolean,
+  FOREIGN KEY(`user_id`) REFERENCES `Users`(`id`)
 );
 
 CREATE TABLE "Comments" (
