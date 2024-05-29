@@ -58,12 +58,6 @@ class JSONServer(HandleRequests):
         #pass
 
     def do_PUT(self):
-<<<<<<< GC-DELETE
-        
-       
-        
-        pass
-=======
         url = self.parse_url(self.path)
         content_len = int(self.headers.get('content-length', 0))
         request_body = self.rfile.read(content_len)
@@ -90,7 +84,6 @@ class JSONServer(HandleRequests):
             return False  # Replace with update_comment
         else:
             return False  # Resource type not supported
->>>>>>> main
 
 
 
