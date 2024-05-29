@@ -69,3 +69,26 @@ def create_user(user):
             'token': id,
             'valid': True
         })
+
+def update_user(user, body):
+    with sqlite3.connect("./db.sqlite3") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+
+        db_cursor.execute(
+            """
+            UPDATE Users
+                SET
+                    first_name = ?,
+                    last_name = ?,
+                    email = ?,
+                    bio = ?,
+                    username = ?,
+                    password = ?,
+                    profile_image_url = ?
+            WHERE id = ?
+            """,
+            (body['first_name'], body['last_name'], body['email'], body['bio'], body['username'], body['password'], body['profile_image_url'], user)
+        )
+        rows_affected = db_cursor.rowcount
+    return True if rows_affected > 0 else False
