@@ -90,3 +90,5 @@ INSERT INTO Tags ('label') VALUES ('JavaScript');
 INSERT INTO Reactions ('label', 'image_url') VALUES ('happy', 'https://pngtree.com/so/happy');
 INSERT INTO Users (first_name, last_name, username, email, password, bio, profile_image_url, created_on, active)
 VALUES ('John', 'Doe', 'johndoe', 'john.doe@example.com', 'password123', 'A sample bio', 'https://example.com/johndoe.jpg', '2024-05-29', 1);
+INSERT INTO Users (first_name, last_name, username, email, password, bio, profile_image_url, created_on, active)
+VALUES ('Jane', 'Smith', 'janesmith', 'jane.smith@example.com', 'password123', 'A sample bio', 'https://example.com/janesmith.jpg', '2024-05-29', 1);
