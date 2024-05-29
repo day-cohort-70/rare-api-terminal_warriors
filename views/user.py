@@ -1,3 +1,4 @@
+#user.py
 import sqlite3
 import json
 from datetime import datetime
@@ -69,3 +70,54 @@ def create_user(user):
             'token': id,
             'valid': True
         })
+
+def list_users():
+    """Lists all users"""
+    with sqlite3.connect('./db.sqlite3') as conn:
+        conn.row_factory=sqlite3.Row
+        db_cursor=conn.cursor()
+
+        #Write the SQL query to get the information you want
+        db_cursor.execute("""
+        SELECT
+                          u.id,
+                          u.first_name,
+                          u.last_name,
+                          u.username,
+                          u.email,
+                          u.bio,
+                          u.password,
+                          u.profile_image_url,
+                          u.created_on,
+                          u.active
+
+            FROM Users u
+            """)
+        query_results=db_cursor.fetchall()
+
+        users=[]
+        for row in query_results:
+            users.append(dict(row))
+
+        serialized_users=json.dumps(users)
+
+    return serialized_users
+        
+    
+def retrieve_user(pk):
+    """Retrieves a single user by primary key"""
+    with sqlite3.connect('./db.sqlite3') as conn: 
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+
+        db_cursor.execute("""
+        SELECT u.id, u.first_name, u.last_name, u.username, u.email, u.bio, u.profile_image_url, u.created_on, u.active
+        FROM Users u
+        WHERE u.id = ?
+        """, (pk,))
+        
+        user = db_cursor.fetchone()
+        dictionary_version_of_object = dict(user) if user else {}
+        serialized_user = json.dumps(dictionary_version_of_object)
+
+    return serialized_user
