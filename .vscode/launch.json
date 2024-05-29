@@ -5,10 +5,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Request Handler",
+            "name": "JSON Server",
             "type": "python",
             "request": "launch",
             "program": "json-server.py",
+            "justMyCode": true,
             "console": "integratedTerminal"
         }
     ]
