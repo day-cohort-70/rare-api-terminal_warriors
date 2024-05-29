@@ -77,6 +77,7 @@ def create_user(user_request_body):
             'valid': True
         })
 
+
 def update_user(user, body):
     with sqlite3.connect("./db.sqlite3") as conn:
         conn.row_factory = sqlite3.Row
@@ -99,8 +100,8 @@ def update_user(user, body):
         )
         rows_affected = db_cursor.rowcount
     return True if rows_affected > 0 else False
-  
-  
+
+
 def list_users():
     """Lists all users"""
     with sqlite3.connect('./db.sqlite3') as conn:
@@ -132,8 +133,8 @@ def list_users():
         serialized_users=json.dumps(users)
 
     return serialized_users
-        
-    
+
+
 def retrieve_user(pk):
     """Retrieves a single user by primary key"""
     with sqlite3.connect('./db.sqlite3') as conn: 

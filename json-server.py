@@ -28,20 +28,19 @@ class JSONServer(HandleRequests):
     def do_POST(self):
 
         url = self.parse_url(self.path)
-
         request_body = JSONServer.parse_request_body(self)
 
         if url['requested_resource'] == 'users':
-
             response_body = create_user(request_body)
-
             return self.response(response_body, status.HTTP_201_SUCCESS_CREATED.value)
         
         if url['requested_resource'] == 'login':
-
             response_body = login_user(request_body)
-
             return self.response(response_body, status.HTTP_200_SUCCESS.value)
+        
+        
+        
+        return self.response("Not found", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
 
 
     def do_DELETE(self):
@@ -49,9 +48,7 @@ class JSONServer(HandleRequests):
 
     def do_PUT(self):
         url = self.parse_url(self.path)
-        content_len = int(self.headers.get('content-length', 0))
-        request_body = self.rfile.read(content_len)
-        request_body = json.loads(request_body)
+        request_body = JSONServer.parse_request_body(self)
         resource_type = url["requested_resource"]
         pk = url["pk"]
 
