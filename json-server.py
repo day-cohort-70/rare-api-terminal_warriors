@@ -2,7 +2,7 @@
 import json
 from http.server import HTTPServer
 from nss_handler import HandleRequests, status
-from views.user import list_users,retrieve_user,delete_user
+from views.user import list_users,retrieve_user
 
 from views import create_user,login_user, update_user
 
@@ -45,17 +45,7 @@ class JSONServer(HandleRequests):
 
 
     def do_DELETE(self):
-        url=self.parse_url(self.path)
-        pk =url["pk"]
-
-        if url["requested_resource"]=='users':
-            if pk !=0:
-                succesfully_deleted=delete_user(pk)
-                if succesfully_deleted:
-                    return self.response("",status.HTTP_204_SUCCESS_NO_RESPONSE_BODY.value)
-                
-                return self.response("requested resource not found", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
-        #pass
+        pass
 
     def do_PUT(self):
         url = self.parse_url(self.path)
