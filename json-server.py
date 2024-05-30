@@ -4,7 +4,7 @@ from http.server import HTTPServer
 from nss_handler import HandleRequests, status
 from views.user import list_users,retrieve_user
 
-from views import create_user,login_user, update_user, filteredAllPosts
+from views import create_user,login_user, update_user, filteredAllPosts, delete_user
 
 class JSONServer(HandleRequests):
 
@@ -37,18 +37,26 @@ class JSONServer(HandleRequests):
         if url['requested_resource'] == 'users':
             response_body = create_user(request_body)
             return self.response(response_body, status.HTTP_201_SUCCESS_CREATED.value)
-        
+
         if url['requested_resource'] == 'login':
             response_body = login_user(request_body)
             return self.response(response_body, status.HTTP_200_SUCCESS.value)
-        
-        
-        
+
         return self.response("Not found", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
 
 
     def do_DELETE(self):
-        pass
+        url=self.parse_url(self.path)
+        pk =url["pk"]
+
+        if url["requested_resource"]=='users':
+            if pk !=0:
+                succesfully_deleted = delete_user(pk)
+                if succesfully_deleted:
+                    return self.response("",status.HTTP_204_SUCCESS_NO_RESPONSE_BODY.value)
+
+                return self.response("requested resource not found", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
+
 
     def do_PUT(self):
         url = self.parse_url(self.path)
@@ -63,6 +71,7 @@ class JSONServer(HandleRequests):
                     return self.response("", status.HTTP_204_SUCCESS_NO_RESPONSE_BODY.value)
             return self.response("Request resource not found", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
         return self.response("Not found", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
+
 
     def update_resource(self, resource_type, pk, request_body):
         if resource_type == "users":
