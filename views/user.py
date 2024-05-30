@@ -152,3 +152,21 @@ def retrieve_user(pk):
         serialized_user = json.dumps(dictionary_version_of_object)
 
     return serialized_user
+
+
+def delete_user(pk):
+    with sqlite3.connect("./db.sqlite3") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+
+        # write the SQL query to get the information you want
+        db_cursor.execute(
+            """
+        DELETE FROM Users WHERE id = ?
+                          
+                          """,
+            (pk,),
+        )
+        
+        number_of_rows_delete = db_cursor.rowcount
+    return True if number_of_rows_delete > 0 else False
