@@ -65,3 +65,6 @@ def create_category(user_request_body):
             'id': id,
             'label': user_request_body['label']
         })
+    
+def delete_category(pk):
+    

@@ -33,6 +33,7 @@ class JSONServer(HandleRequests):
         
         return self.response("",status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
 
+
     def do_POST(self):
 
         response_body=""
@@ -45,7 +46,7 @@ class JSONServer(HandleRequests):
 
         if url['requested_resource'] == 'users':
             response_body = create_user(request_body)
-        
+
         if url['requested_resource'] == 'categories':
             response_body = create_category(request_body)
 
@@ -65,7 +66,7 @@ class JSONServer(HandleRequests):
                 if succesfully_deleted:
                     return self.response("",status.HTTP_204_SUCCESS_NO_RESPONSE_BODY.value)
 
-                return self.response("requested resource not found", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
+        return self.response("requested resource not found", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
 
 
     def do_PUT(self):
