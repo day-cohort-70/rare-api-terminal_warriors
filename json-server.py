@@ -5,38 +5,48 @@ from nss_handler import HandleRequests, status
 from views.user import list_users,retrieve_user
 
 from views import create_user,login_user, update_user, delete_user
+from views import list_categories, retrieve_category
 
 class JSONServer(HandleRequests):
 
     def do_GET(self):
-        """Handle GET requests from a client"""
 
         response_body = ""
         url = self.parse_url(self.path)
-        
+
         if url["requested_resource"] == "users":
-            if url["pk"] != 0:
+            if url["pk"]:
                 response_body = retrieve_user(url["pk"])
-                return self.response(response_body, status.HTTP_200_SUCCESS.value)
-            
-            response_body = list_users()
+            else:
+                response_body = list_users()
+
+        if url["requested_resource"] == "categories":
+            if url["pk"]:
+                response_body = retrieve_category(url["pk"])
+            else:
+                response_body = list_categories()
+
+        if response_body == 'id not found':
+            return self.response("", status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA.value)
+        elif response_body:
             return self.response(response_body, status.HTTP_200_SUCCESS.value)
-        
         else:
             return self.response("",status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
 
     def do_POST(self):
 
+        response_body=""
         url = self.parse_url(self.path)
         request_body = JSONServer.parse_request_body(self)
+
+        if url['requested_resource'] == 'login':
+            response_body = login_user(request_body)
+            return self.response(response_body, status.HTTP_200_SUCCESS.value)
 
         if url['requested_resource'] == 'users':
             response_body = create_user(request_body)
             return self.response(response_body, status.HTTP_201_SUCCESS_CREATED.value)
 
-        if url['requested_resource'] == 'login':
-            response_body = login_user(request_body)
-            return self.response(response_body, status.HTTP_200_SUCCESS.value)
 
         return self.response("Not found", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
 

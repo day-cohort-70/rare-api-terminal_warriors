@@ -1,4 +1,3 @@
-#user.py
 import sqlite3
 import json
 from datetime import datetime
@@ -146,12 +145,14 @@ def retrieve_user(pk):
         FROM Users u
         WHERE u.id = ?
         """, (pk,))
-        
-        user = db_cursor.fetchone()
-        dictionary_version_of_object = dict(user) if user else {}
-        serialized_user = json.dumps(dictionary_version_of_object)
 
-    return serialized_user
+        user = db_cursor.fetchone()
+
+    if user is None:
+        return 'id not found'
+
+    user_dictionary = dict(user)
+    return json.dumps(user_dictionary)
 
 
 def delete_user(pk):
