@@ -2,10 +2,11 @@
 import json
 from http.server import HTTPServer
 from nss_handler import HandleRequests, status
-from views.user import list_users,retrieve_user
 
-from views import create_user,login_user, update_user, delete_user
-from views import list_categories, retrieve_category, create_category
+from views import list_users,retrieve_user, create_user,login_user, update_user, delete_user
+from views import list_categories, retrieve_category, create_category,delete_category
+from views import filteredAllPosts
+
 
 class JSONServer(HandleRequests):
 
@@ -25,6 +26,10 @@ class JSONServer(HandleRequests):
                 response_body = retrieve_category(url["pk"])
             else:
                 response_body = list_categories()
+
+        if url["requested_resource"] == "posts":
+            response_body = filteredAllPosts()
+
 
         if response_body == 'id not found':
             return self.response("", status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA.value)
@@ -57,14 +62,21 @@ class JSONServer(HandleRequests):
 
 
     def do_DELETE(self):
+
+        succesfully_deleted = False
         url=self.parse_url(self.path)
         pk =url["pk"]
 
         if url["requested_resource"]=='users':
-            if pk !=0:
+            if pk:
                 succesfully_deleted = delete_user(pk)
-                if succesfully_deleted:
-                    return self.response("",status.HTTP_204_SUCCESS_NO_RESPONSE_BODY.value)
+
+        if url["requested_resource"]=='categories':
+            if pk:
+                succesfully_deleted = delete_category(pk)
+
+        if succesfully_deleted:
+            return self.response("",status.HTTP_204_SUCCESS_NO_RESPONSE_BODY.value)
 
         return self.response("requested resource not found", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
 

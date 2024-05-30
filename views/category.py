@@ -65,6 +65,19 @@ def create_category(user_request_body):
             'id': id,
             'label': user_request_body['label']
         })
-    
+
 def delete_category(pk):
     
+    with sqlite3.connect('./db.sqlite3') as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+
+        db_cursor.execute("""
+        DELETE
+        FROM Categories
+        WHERE id = ?
+        """, (pk,))
+
+        number_of_rows_delete = db_cursor.rowcount
+
+    return True if number_of_rows_delete > 0 else False
