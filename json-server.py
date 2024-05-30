@@ -4,7 +4,7 @@ from http.server import HTTPServer
 from nss_handler import HandleRequests, status
 from views.user import list_users,retrieve_user
 
-from views import create_user,login_user, update_user, delete_user
+from views import create_user,login_user, update_user, filteredAllPosts, delete_user
 
 class JSONServer(HandleRequests):
 
@@ -20,6 +20,10 @@ class JSONServer(HandleRequests):
                 return self.response(response_body, status.HTTP_200_SUCCESS.value)
             
             response_body = list_users()
+            return self.response(response_body, status.HTTP_200_SUCCESS.value)
+        
+        elif url["requested_resource"] == "posts":
+            response_body = filteredAllPosts()
             return self.response(response_body, status.HTTP_200_SUCCESS.value)
         
         else:
