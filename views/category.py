@@ -44,3 +44,24 @@ def retrieve_category(pk):
 
     category_dictionary = dict(category)
     return json.dumps(category_dictionary)
+
+
+def create_category(user_request_body):
+
+    with sqlite3.connect('./db.sqlite3') as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+
+        db_cursor.execute("""
+        Insert into Categories (
+            label
+        ) 
+        values (?)
+        """, (user_request_body['label'],))
+
+        id = db_cursor.lastrowid
+
+        return json.dumps({
+            'id': id,
+            'label': user_request_body['label']
+        })

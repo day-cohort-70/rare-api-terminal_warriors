@@ -5,7 +5,7 @@ from nss_handler import HandleRequests, status
 from views.user import list_users,retrieve_user
 
 from views import create_user,login_user, update_user, delete_user
-from views import list_categories, retrieve_category
+from views import list_categories, retrieve_category, create_category
 
 class JSONServer(HandleRequests):
 
@@ -28,10 +28,10 @@ class JSONServer(HandleRequests):
 
         if response_body == 'id not found':
             return self.response("", status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA.value)
-        elif response_body:
+        if response_body:
             return self.response(response_body, status.HTTP_200_SUCCESS.value)
-        else:
-            return self.response("",status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
+        
+        return self.response("",status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
 
     def do_POST(self):
 
@@ -45,8 +45,12 @@ class JSONServer(HandleRequests):
 
         if url['requested_resource'] == 'users':
             response_body = create_user(request_body)
-            return self.response(response_body, status.HTTP_201_SUCCESS_CREATED.value)
+        
+        if url['requested_resource'] == 'categories':
+            response_body = create_category(request_body)
 
+        if response_body:
+            return self.response(response_body, status.HTTP_201_SUCCESS_CREATED.value)
 
         return self.response("Not found", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
 

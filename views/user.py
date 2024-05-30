@@ -37,11 +37,6 @@ def login_user(user):
 
 
 def create_user(user_request_body):
-    # Adds a user to the database when they register
-    # Args:
-    #     user (dictionary): The dictionary passed to the register post request
-    # Returns:
-    #     json string: Contains the token of the newly created user
 
     with sqlite3.connect('./db.sqlite3') as conn:
         conn.row_factory = sqlite3.Row
