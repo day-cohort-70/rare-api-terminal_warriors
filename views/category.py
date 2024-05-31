@@ -81,3 +81,26 @@ def delete_category(pk):
         number_of_rows_delete = db_cursor.rowcount
 
     return True if number_of_rows_delete > 0 else False
+
+def update_category(pk, body):
+    
+    with sqlite3.connect("./db.sqlite3") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+
+        db_cursor.execute(
+            """
+            UPDATE Categories
+            SET
+                label = ?
+            WHERE id = ?
+            """,
+            (body["label"],pk)
+        )
+
+    updated_category = {
+        "id": pk,
+        "label": body['label']
+    }
+
+    return json.dumps(updated_category)

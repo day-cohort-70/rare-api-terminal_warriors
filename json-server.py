@@ -4,7 +4,7 @@ from http.server import HTTPServer
 from nss_handler import HandleRequests, status
 
 from views import list_users,retrieve_user, create_user,login_user, update_user, delete_user
-from views import list_categories, retrieve_category, create_category,delete_category
+from views import list_categories, retrieve_category, create_category,delete_category, update_category
 from views import filteredAllPosts
 
 
@@ -12,22 +12,25 @@ class JSONServer(HandleRequests):
 
     def do_GET(self):
 
-        response_body = ""
         url = self.parse_url(self.path)
+        requested_resource = url["requested_resource"]
+        pk = url["pk"]
+        response_body = ""
 
-        if url["requested_resource"] == "users":
-            if url["pk"]:
-                response_body = retrieve_user(url["pk"])
+
+        if requested_resource == "users":
+            if pk != 0:
+                response_body = retrieve_user(pk)
             else:
                 response_body = list_users()
 
-        if url["requested_resource"] == "categories":
-            if url["pk"]:
-                response_body = retrieve_category(url["pk"])
+        if requested_resource == "categories":
+            if pk != 0:
+                response_body = retrieve_category(pk)
             else:
                 response_body = list_categories()
 
-        if url["requested_resource"] == "posts":
+        if requested_resource == "posts":
             response_body = filteredAllPosts()
 
 
@@ -41,18 +44,19 @@ class JSONServer(HandleRequests):
 
     def do_POST(self):
 
-        response_body=""
         url = self.parse_url(self.path)
         request_body = JSONServer.parse_request_body(self)
+        requested_resource = url["requested_resource"]
+        response_body=""
 
-        if url['requested_resource'] == 'login':
+        if requested_resource == 'login':
             response_body = login_user(request_body)
             return self.response(response_body, status.HTTP_200_SUCCESS.value)
 
-        if url['requested_resource'] == 'users':
+        if requested_resource == 'users':
             response_body = create_user(request_body)
 
-        if url['requested_resource'] == 'categories':
+        if requested_resource == 'categories':
             response_body = create_category(request_body)
 
         if response_body:
@@ -82,31 +86,25 @@ class JSONServer(HandleRequests):
 
 
     def do_PUT(self):
+        
         url = self.parse_url(self.path)
         request_body = JSONServer.parse_request_body(self)
-        resource_type = url["requested_resource"]
+        requested_resource = url["requested_resource"]
         pk = url["pk"]
+        response_body = ""
 
-        if resource_type in ["users", "posts", "tags", "comments"]:
+        if requested_resource == "users":
             if pk != 0:
-                response_body = self.update_resource(resource_type, pk, request_body)
-                if response_body:
-                    return self.response("", status.HTTP_204_SUCCESS_NO_RESPONSE_BODY.value)
-            return self.response("Request resource not found", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
+                response_body = update_user(pk ,request_body)
+
+        if requested_resource == "categories":
+            if pk != 0:
+                response_body = update_category(pk,request_body)
+
+        if response_body:
+            return self.response(response_body, status.HTTP_201_SUCCESS_CREATED.value)
+        
         return self.response("Not found", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
-
-
-    def update_resource(self, resource_type, pk, request_body):
-        if resource_type == "users":
-            return update_user(pk, request_body)
-        elif resource_type == "posts":
-            return False  # Replace with update_posts
-        elif resource_type == "tag":
-            return False  # Replace with update_tags
-        elif resource_type == "comment":
-            return False  # Replace with update_comment
-        else:
-            return False  # Resource type not supported
 
 
 

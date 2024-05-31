@@ -92,8 +92,18 @@ def update_user(user, body):
             """,
             (body['first_name'], body['last_name'], body['email'], body['bio'], body['username'], body['password'], body['profile_image_url'], user)
         )
-        rows_affected = db_cursor.rowcount
-    return True if rows_affected > 0 else False
+
+    updated_user = {
+        "id": user,
+        "first_name": body['first_name'],
+        "last_name": body['last_name'],
+        "email": body['email'],
+        "bio": body['bio'],
+        "username": body['username'],
+        "profile_image_url":body['profile_image_url']
+    }
+
+    return json.dumps(updated_user)
 
 
 def list_users():
