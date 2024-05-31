@@ -54,9 +54,10 @@ class JSONServer(HandleRequests):
         requested_resource = url["requested_resource"]
         response_body=""
 
+        # JSON.dumps() is being invoked in each function
         if requested_resource == 'login':
             response_body = login_user(request_body)
-            return self.response(json.dumps(response_body), status.HTTP_200_SUCCESS.value)
+            return self.response(response_body, status.HTTP_200_SUCCESS.value)
         
         if requested_resource == 'tags':
             response_body = create_tag(request_body)
@@ -72,6 +73,7 @@ class JSONServer(HandleRequests):
 
         return self.response("Not found", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
 
+    
     def do_DELETE(self):
 
         succesfully_deleted = False
@@ -95,7 +97,6 @@ class JSONServer(HandleRequests):
     def do_PUT(self):
         
         url = self.parse_url(self.path)
-
         request_body = self.parse_request_body()
         requested_resource = url["requested_resource"]
         pk = url["pk"]
