@@ -14,11 +14,14 @@ def filteredAllPosts():
             p.title,
             p.publication_date,
             p.category_id,
+            c.label,
             u.first_name,
             u.last_name
         FROM Posts p
         JOIN Users u
             ON p.user_id = u.id
+        LEFT JOIN Categories c
+            ON p.category_id = c.id
         WHERE approved = TRUE
         AND publication_date <= DATE('now')
         ORDER BY publication_date DESC
@@ -33,6 +36,7 @@ def filteredAllPosts():
                 "title": row['title'],
                 "publication_date": row['publication_date'],
                 "author": f"{row['first_name']} {row['last_name']}",
+                "category_name": row['label']
             }
             db_cursor.execute("""
             SELECT t.label
