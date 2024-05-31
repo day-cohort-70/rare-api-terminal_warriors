@@ -40,3 +40,14 @@ def list_tags():
         serialized_tags = json.dumps(tags)
 
     return serialized_tags
+
+def delete_tag(pk):
+    with sqlite3.connect("./db.sqlite3") as conn:
+        db_cursor = conn.cursor()
+
+        db_cursor.execute("""
+        DELETE FROM Tags WHERE id = ?
+""", (pk,)
+)
+        conn.commit()
+        return db_cursor.rowcount > 0
