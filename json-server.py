@@ -6,6 +6,8 @@ from nss_handler import HandleRequests, status
 from views import list_users,retrieve_user, create_user,login_user, update_user, delete_user
 from views import list_categories, retrieve_category, create_category,delete_category, update_category
 from views import filteredAllPosts
+from views import create_tag, list_tags
+
 
 
 class JSONServer(HandleRequests):
@@ -30,6 +32,9 @@ class JSONServer(HandleRequests):
             else:
                 response_body = list_categories()
 
+        if requested_resource == "tags":
+            response_body = list_tags()
+
         if requested_resource == "posts":
             response_body = filteredAllPosts()
 
@@ -45,14 +50,17 @@ class JSONServer(HandleRequests):
     def do_POST(self):
 
         url = self.parse_url(self.path)
-        request_body = JSONServer.parse_request_body(self)
+        request_body = self.parse_request_body()
         requested_resource = url["requested_resource"]
         response_body=""
 
         if requested_resource == 'login':
             response_body = login_user(request_body)
-            return self.response(response_body, status.HTTP_200_SUCCESS.value)
-
+            return self.response(json.dumps(response_body), status.HTTP_200_SUCCESS.value)
+        
+        if requested_resource == 'tags':
+            response_body = create_tag(request_body)
+        
         if requested_resource == 'users':
             response_body = create_user(request_body)
 
@@ -63,7 +71,6 @@ class JSONServer(HandleRequests):
             return self.response(response_body, status.HTTP_201_SUCCESS_CREATED.value)
 
         return self.response("Not found", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
-
 
     def do_DELETE(self):
 
@@ -88,7 +95,8 @@ class JSONServer(HandleRequests):
     def do_PUT(self):
         
         url = self.parse_url(self.path)
-        request_body = JSONServer.parse_request_body(self)
+
+        request_body = self.parse_request_body()
         requested_resource = url["requested_resource"]
         pk = url["pk"]
         response_body = ""
@@ -99,14 +107,12 @@ class JSONServer(HandleRequests):
 
         if requested_resource == "categories":
             if pk != 0:
-                response_body = update_category(pk,request_body)
+                response_body = update_category(pk ,request_body)
 
         if response_body:
             return self.response(response_body, status.HTTP_201_SUCCESS_CREATED.value)
         
         return self.response("Not found", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
-
-
 
 
 
@@ -120,3 +126,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
