@@ -14,8 +14,8 @@ def create_tag(tag_data):
             (tag_data["label"],),
         )
         id = db_cursor.lastrowid
-        conn.commit()
-        return {"id": id}
+
+        return json.dumps({"id": id})
 
 
 def list_tags():
