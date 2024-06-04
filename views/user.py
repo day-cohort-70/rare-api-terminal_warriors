@@ -106,28 +106,31 @@ def update_user(user, body):
     return json.dumps(updated_user)
 
 
-def list_users():
-    """Lists all users"""
+def list_users(url):
+
+    query_params = url['query_params']
+
     with sqlite3.connect('./db.sqlite3') as conn:
         conn.row_factory=sqlite3.Row
         db_cursor=conn.cursor()
 
-        #Write the SQL query to get the information you want
-        db_cursor.execute("""
-        SELECT
-                          u.id,
-                          u.first_name,
-                          u.last_name,
-                          u.username,
-                          u.email,
-                          u.bio,
-                          u.password,
-                          u.profile_image_url,
-                          u.created_on,
-                          u.active
+        query_string = """
+            SELECT
+                *
+            FROM Users
+        """
 
-            FROM Users u
-            """)
+        #Add to the query if there is a query parameter
+        if query_params:
+            first_query_key = list(query_params.keys())[0]
+            query_string += f" WHERE {first_query_key} = {query_params[first_query_key][0]}"
+            db_cursor.execute(query_string)
+
+        else:
+            db_cursor.execute(query_string)
+
+        #Write the SQL query to get the information you want
+
         query_results=db_cursor.fetchall()
 
         users=[]
