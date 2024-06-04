@@ -9,7 +9,6 @@ from views import filteredAllPosts
 from views import create_tag, list_tags
 
 
-
 class JSONServer(HandleRequests):
 
     def do_GET(self):
@@ -24,7 +23,7 @@ class JSONServer(HandleRequests):
             if pk != 0:
                 response_body = retrieve_user(pk)
             else:
-                response_body = list_users()
+                response_body = list_users(url)
 
         if requested_resource == "categories":
             if pk != 0:
@@ -78,13 +77,14 @@ class JSONServer(HandleRequests):
 
         succesfully_deleted = False
         url=self.parse_url(self.path)
+        requested_resource = url["requested_resource"]
         pk =url["pk"]
 
-        if url["requested_resource"]=='users':
+        if requested_resource =='users':
             if pk:
                 succesfully_deleted = delete_user(pk)
 
-        if url["requested_resource"]=='categories':
+        if requested_resource =='categories':
             if pk:
                 succesfully_deleted = delete_category(pk)
 
@@ -116,7 +116,7 @@ class JSONServer(HandleRequests):
         return self.response("Not found", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
 
 
-
+  
 
 # ----------------------------------------------
 def main():
