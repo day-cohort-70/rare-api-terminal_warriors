@@ -78,7 +78,7 @@ def allMyPosts(myId):
         WHERE user_id = ?
         AND publication_date <= DATE('now')
         ORDER BY publication_date DESC
-        """, (str(myId[0],)))
+        """, (myId[0],))
         query_results = db_cursor.fetchall()
 
         posts=[]
