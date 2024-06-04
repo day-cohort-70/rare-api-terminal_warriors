@@ -123,8 +123,9 @@ def list_users(url):
         #Add to the query if there is a query parameter
         if query_params:
             first_query_key = list(query_params.keys())[0]
-            query_string += f" WHERE {first_query_key[1:]} = ?"
-            db_cursor.execute(query_string,(query_params[first_query_key][0],))
+            query_string += f" WHERE {first_query_key} = {query_params[first_query_key][0]}"
+            db_cursor.execute(query_string)
+
         else:
             db_cursor.execute(query_string)
 
