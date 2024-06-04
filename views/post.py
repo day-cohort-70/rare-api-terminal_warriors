@@ -61,29 +61,30 @@ def filteredAllPosts():
     return serialized_posts
 
 
-def create_post(post_request_body):
+import sqlite3
+import json
 
+def create_post(post_request_body):
     with sqlite3.connect("./db.sqlite3") as conn:
         conn.row_factory = sqlite3.Row
         db_cursor = conn.cursor()
 
+        # Corrected SQL query
         db_cursor.execute(
             """
-        Insert Into Posts (
+        INSERT INTO Posts (
             user_id,
             category_id,
             title,
-            publication _date,
+            publication_date,
             image_url,
             content,
-            approved 
+            approved
         ) 
-            VALUES (?,?,?,?,?,?,?, 1)
+        VALUES (?,?,?,?,?,?,?)
             """,
             (
-                post_request_body[
-                    "user_id"
-                ],  # Assuming user_id is passed in the request body
+                post_request_body["user_id"],  # Assuming user_id is passed in the request body
                 post_request_body["category_id"],
                 post_request_body["title"],
                 post_request_body["publication_date"],
@@ -94,5 +95,18 @@ def create_post(post_request_body):
         )
 
         id = db_cursor.lastrowid
+        # Corrected response body construction
+        response_body = {
+            "id": id,
+            "user_id": post_request_body["user_id"],
+            "category_id": post_request_body["category_id"],
+            "title": post_request_body["title"],
+            "publication_date": post_request_body["publication_date"],
+            "image_url": post_request_body["image_url"],
+            "content": post_request_body["content"],
+            "approved": post_request_body["approved"]
+        }
 
-        return json.dumps({"message": f"Post {id} created successfully", "valid": True})
+        print(post_request_body)
+        return json.dumps(response_body)
+

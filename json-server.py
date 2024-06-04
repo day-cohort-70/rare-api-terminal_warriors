@@ -7,7 +7,7 @@ from views import list_users,retrieve_user, create_user,login_user, update_user,
 from views import list_categories, retrieve_category, create_category,delete_category, update_category
 from views import filteredAllPosts
 from views import create_tag, list_tags
-
+from views import create_post
 
 
 class JSONServer(HandleRequests):
@@ -58,6 +58,9 @@ class JSONServer(HandleRequests):
         if requested_resource == 'login':
             response_body = login_user(request_body)
             return self.response(response_body, status.HTTP_200_SUCCESS.value)
+        
+        if requested_resource == 'posts':
+            response_body = create_post(request_body)
         
         if requested_resource == 'tags':
             response_body = create_tag(request_body)
