@@ -119,10 +119,13 @@ def list_users(url):
                 *
             FROM Users
         """
+
+        #check for query parameters
         if query_params:
             conditions = []
             parameters = []
 
+            #look at each key/value pair and dynamically add each condition to SQL query (query_string)
             for key, values in query_params.items():
 
                 conditions.append(f"{key} = ?")
