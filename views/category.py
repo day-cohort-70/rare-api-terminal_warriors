@@ -66,6 +66,7 @@ def create_category(user_request_body):
             'label': user_request_body['label']
         })
 
+
 def delete_category(pk):
     
     with sqlite3.connect('./db.sqlite3') as conn:
@@ -81,6 +82,7 @@ def delete_category(pk):
         number_of_rows_delete = db_cursor.rowcount
 
     return True if number_of_rows_delete > 0 else False
+
 
 def update_category(pk, body):
     

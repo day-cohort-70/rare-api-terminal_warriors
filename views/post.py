@@ -2,14 +2,13 @@ import sqlite3
 import json
 from datetime import datetime
 
-
-def filteredAllPosts():
+def filteredAllPosts(url):
     with sqlite3.connect("./db.sqlite3") as conn:
         conn.row_factory = sqlite3.Row
         db_cursor = conn.cursor()
+        query_params = url['query_params']
 
-        db_cursor.execute(
-            """
+        query_string = """
         SELECT
             p.id,
             p.post_id,
@@ -24,11 +23,18 @@ def filteredAllPosts():
             ON p.post_id = u.id
         LEFT JOIN Categories c
             ON p.category_id = c.id
-        WHERE approved = TRUE
-        AND publication_date <= DATE('now')
-        ORDER BY publication_date DESC
         """
-        )
+
+        if query_params:
+            first_query_key = list(query_params.keys())[0]
+            query_string += f" WHERE {first_query_key} = {query_params[first_query_key][0]}"
+            query_string += " AND publication_date <= DATE('now') ORDER BY publication_date DESC"
+            db_cursor.execute(query_string)
+        else:
+            query_string += "WHERE approved = TRUE"
+            query_string += " AND publication_date <= DATE('now') ORDER BY publication_date DESC"
+            db_cursor.execute(query_string)
+        
         query_results = db_cursor.fetchall()
 
         posts = []
