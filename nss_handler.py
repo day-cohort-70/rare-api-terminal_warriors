@@ -1,8 +1,9 @@
-# nss_handler.py
+#nss_handler.py
 import json
 from enum import Enum
 from urllib.parse import urlparse, parse_qs
 from http.server import BaseHTTPRequestHandler
+
 
 class status(Enum):
     HTTP_200_SUCCESS = 200
@@ -15,7 +16,7 @@ class status(Enum):
 class HandleRequests(BaseHTTPRequestHandler):
 
     def parse_request_body(self):
-        content_length = int(self.headers.get('content-length', 0))
+        content_length = int(self.headers.get('content-length',0))
         request_body = self.rfile.read(content_length)
         return json.loads(request_body)
 
@@ -47,18 +48,15 @@ class HandleRequests(BaseHTTPRequestHandler):
 
         return url_dictionary
 
-    # * Updated method to ensure CORS headers are set correctly
     def set_response_code(self, status):
         self.send_response(status)
         self.send_header('Content-type', 'application/json')
-        self.send_header('Access-Control-Allow-Origin', '*')  # ! Allow any origin
-        self.send_header('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept')  # ! Allow necessary headers
+        self.send_header('Access-Control-Allow-Origin', '*')
         self.end_headers()
 
-    # * Updated OPTIONS method to handle preflight CORS requests
     def do_OPTIONS(self):
         self.send_response(200)
-        self.send_header('Access-Control-Allow-Origin', '*')  # ! Allow any origin
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')  # ! Allow necessary methods
-        self.send_header('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept')  # ! Allow necessary headers
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
+        self.send_header('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept')
         self.end_headers()
