@@ -1,4 +1,4 @@
-#nss_handler.py
+# nss_handler.py
 import json
 from enum import Enum
 from urllib.parse import urlparse, parse_qs
@@ -13,10 +13,11 @@ class status(Enum):
     HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND = 404
     HTTP_500_SERVER_ERROR = 500
 
+
 class HandleRequests(BaseHTTPRequestHandler):
 
     def parse_request_body(self):
-        content_length = int(self.headers.get('content-length',0))
+        content_length = int(self.headers.get("content-length", 0))
         request_body = self.rfile.read(content_length)
         return json.loads(request_body)
 
@@ -27,14 +28,10 @@ class HandleRequests(BaseHTTPRequestHandler):
     def parse_url(self, path):
         """Parse the url into the resource and id"""
         parsed_url = urlparse(path)
-        path_params = parsed_url.path.split('/')
+        path_params = parsed_url.path.split("/")
         resource = path_params[1]
 
-        url_dictionary = {
-            "requested_resource": resource,
-            "query_params": {},
-            "pk": 0
-        }
+        url_dictionary = {"requested_resource": resource, "query_params": {}, "pk": 0}
 
         if parsed_url.query:
             query = parse_qs(parsed_url.query)
@@ -50,13 +47,17 @@ class HandleRequests(BaseHTTPRequestHandler):
 
     def set_response_code(self, status):
         self.send_response(status)
-        self.send_header('Content-type', 'application/json')
-        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header("Content-type", "application/json")
+        self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
 
-    def do_OPTIONS(self):
-        self.send_response(200)
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
-        self.send_header('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept')
-        self.end_headers()
+
+def do_OPTIONS(self):
+    self.send_response(200)
+    self.send_header("Access-Control-Allow-Origin", "*")
+    self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
+    self.send_header(
+        "Access-Control-Allow-Headers",
+        "X-Requested-With, Content-Type, Accept, Authorization",
+    )
+    self.end_headers()
