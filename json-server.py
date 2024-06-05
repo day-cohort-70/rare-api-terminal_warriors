@@ -5,7 +5,7 @@ from nss_handler import HandleRequests, status
 
 from views import list_users,retrieve_user, create_user,login_user, update_user, delete_user
 from views import list_categories, retrieve_category, create_category,delete_category, update_category
-from views import filteredAllPosts, allMyPosts
+from views import filteredAllPosts
 from views import create_tag, list_tags,delete_tag,update_tag
 
 
@@ -36,10 +36,7 @@ class JSONServer(HandleRequests):
             response_body = list_tags()
 
         if requested_resource == "posts":
-            if query_params["authorId"] != 0:
-                response_body = allMyPosts(query_params["authorId"])
-            else:
-                response_body = filteredAllPosts()
+            response_body = filteredAllPosts(url)
 
 
         if response_body == 'id not found':
