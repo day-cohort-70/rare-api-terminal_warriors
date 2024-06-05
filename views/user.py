@@ -119,12 +119,17 @@ def list_users(url):
                 *
             FROM Users
         """
-
-        #Add to the query if there is a query parameter
         if query_params:
-            first_query_key = list(query_params.keys())[0]
-            query_string += f" WHERE {first_query_key} = {query_params[first_query_key][0]}"
-            db_cursor.execute(query_string)
+            conditions = []
+            parameters = []
+
+            for key, values in query_params.items():
+
+                conditions.append(f"{key} = ?")
+                parameters.append(values[0])
+
+            query_string += " WHERE " + " AND " .join(conditions)
+            db_cursor.execute(query_string,(parameters))
 
         else:
             db_cursor.execute(query_string)
