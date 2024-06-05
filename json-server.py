@@ -6,7 +6,7 @@ from nss_handler import HandleRequests, status
 from views import list_users,retrieve_user, create_user,login_user, update_user, delete_user
 from views import list_categories, retrieve_category, create_category,delete_category, update_category
 from views import filteredAllPosts, allMyPosts
-from views import create_tag, list_tags
+from views import create_tag, list_tags,delete_tag,update_tag
 
 
 class JSONServer(HandleRequests):
@@ -92,6 +92,10 @@ class JSONServer(HandleRequests):
             if pk:
                 succesfully_deleted = delete_category(pk)
 
+        if url["requested_resource"]=='tags':
+            if pk:
+                succesfully_deleted = delete_tag(pk)
+
         if succesfully_deleted:
             return self.response("",status.HTTP_204_SUCCESS_NO_RESPONSE_BODY.value)
 
@@ -99,7 +103,6 @@ class JSONServer(HandleRequests):
 
 
     def do_PUT(self):
-        
         url = self.parse_url(self.path)
         request_body = self.parse_request_body()
         requested_resource = url["requested_resource"]
@@ -108,16 +111,21 @@ class JSONServer(HandleRequests):
 
         if requested_resource == "users":
             if pk != 0:
-                response_body = update_user(pk ,request_body)
+                response_body = update_user(pk, request_body)
 
         if requested_resource == "categories":
             if pk != 0:
-                response_body = update_category(pk ,request_body)
+                response_body = update_category(pk, request_body)
+
+        if requested_resource == "tags":
+            if pk != 0:
+                response_body = update_tag(pk, request_body) 
 
         if response_body:
             return self.response(response_body, status.HTTP_201_SUCCESS_CREATED.value)
-        
+
         return self.response("Not found", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
+
 
 
   
