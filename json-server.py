@@ -69,6 +69,9 @@ class JSONServer(HandleRequests):
 
         if requested_resource == 'categories':
             response_body = create_category(request_body)
+            
+        if requested_resource == 'post':
+            response_body = create_post(request_body)
 
         if requested_resource == 'tags':
             response_body = create_tag(request_body)
