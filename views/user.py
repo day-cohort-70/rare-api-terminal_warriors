@@ -145,13 +145,12 @@ def list_users(url):
         for row in query_results:
             users.append(dict(row))
 
-        serialized_users=json.dumps(users)
+        response_body = json.dumps(users)
 
-    return serialized_users
+    return response_body
 
 
 def retrieve_user(pk):
-    """Retrieves a single user by primary key"""
     with sqlite3.connect('./db.sqlite3') as conn: 
         conn.row_factory = sqlite3.Row
         db_cursor = conn.cursor()
@@ -168,6 +167,7 @@ def retrieve_user(pk):
         return 'id not found'
 
     user_dictionary = dict(user)
+    
     return json.dumps(user_dictionary)
 
 
