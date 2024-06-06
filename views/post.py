@@ -109,5 +109,5 @@ def postDetails(pk):
         tags = [tag['label'] for tag in tag_results]
         post["tags"] = tags
 
-        serialized_post = json.dumps(dict(query_results))
+        serialized_post = json.dumps(dict(post))
         return serialized_post
