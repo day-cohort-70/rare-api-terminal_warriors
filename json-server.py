@@ -7,6 +7,7 @@ from views import list_users,retrieve_user, create_user,login_user, update_user,
 from views import list_categories, retrieve_category, create_category,delete_category, update_category
 from views import filteredAllPosts
 from views import create_tag, list_tags,delete_tag,update_tag
+from views import list_post_tags, retrieve_post_tag, create_post_tag, delete_post_tag, update_post_tag
 
 
 class JSONServer(HandleRequests):
@@ -15,7 +16,6 @@ class JSONServer(HandleRequests):
 
         url = self.parse_url(self.path)
         requested_resource = url["requested_resource"]
-        query_params = url["query_params"]
         pk = url["pk"]
         response_body = ""
 
@@ -35,9 +35,15 @@ class JSONServer(HandleRequests):
         if requested_resource == "tags":
             response_body = list_tags()
 
+
         if requested_resource == "posts":
             response_body = filteredAllPosts(url)
 
+        if requested_resource == "post_tags":
+            if pk != 0:
+                response_body = retrieve_post_tag(pk)
+            else:
+                response_body = list_post_tags(url)
 
         if response_body == 'id not found':
             return self.response("", status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA.value)
@@ -58,15 +64,18 @@ class JSONServer(HandleRequests):
         if requested_resource == 'login':
             response_body = login_user(request_body)
             return self.response(response_body, status.HTTP_200_SUCCESS.value)
-        
-        if requested_resource == 'tags':
-            response_body = create_tag(request_body)
-        
+
         if requested_resource == 'users':
             response_body = create_user(request_body)
 
         if requested_resource == 'categories':
             response_body = create_category(request_body)
+
+        if requested_resource == 'tags':
+            response_body = create_tag(request_body)
+
+        if requested_resource == 'post_tags':
+            response_body = create_post_tag(request_body)
 
         if response_body:
             return self.response(response_body, status.HTTP_201_SUCCESS_CREATED.value)
@@ -75,11 +84,10 @@ class JSONServer(HandleRequests):
 
     
     def do_DELETE(self):
-
-        succesfully_deleted = False
         url=self.parse_url(self.path)
         requested_resource = url["requested_resource"]
         pk =url["pk"]
+        succesfully_deleted = False
 
         if requested_resource =='users':
             if pk:
@@ -92,6 +100,10 @@ class JSONServer(HandleRequests):
         if url["requested_resource"]=='tags':
             if pk:
                 succesfully_deleted = delete_tag(pk)
+
+        if url["requested_resource"]=='post_tags':
+            if pk:
+                succesfully_deleted = delete_post_tag(pk)
 
         if succesfully_deleted:
             return self.response("",status.HTTP_204_SUCCESS_NO_RESPONSE_BODY.value)
@@ -116,7 +128,11 @@ class JSONServer(HandleRequests):
 
         if requested_resource == "tags":
             if pk != 0:
-                response_body = update_tag(pk, request_body) 
+                response_body = update_tag(pk, request_body)
+
+        if requested_resource == "post_tags":
+            if pk != 0:
+                response_body = update_post_tag(pk, request_body)
 
         if response_body:
             return self.response(response_body, status.HTTP_201_SUCCESS_CREATED.value)
