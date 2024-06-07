@@ -2,83 +2,151 @@
 import json
 from http.server import HTTPServer
 from nss_handler import HandleRequests, status
-from views.user import list_users,retrieve_user
 
-from views import create_user,login_user, update_user
+from views import list_users,retrieve_user, create_user,login_user, update_user, delete_user
+from views import list_categories, retrieve_category, create_category,delete_category, update_category
+from views import filteredAllPosts, postDetails, create_post
+from views import create_tag, list_tags,delete_tag,update_tag
+from views import list_post_tags, retrieve_post_tag, create_post_tag, delete_post_tag, update_post_tag
+
 
 class JSONServer(HandleRequests):
 
     def do_GET(self):
-        """Handle GET requests from a client"""
 
-        response_body = ""
         url = self.parse_url(self.path)
-        
-        if url["requested_resource"] == "users":
+        requested_resource = url["requested_resource"]
+        pk = url["pk"]
+        response_body = ""
+
+
+        if requested_resource == "users":
+            if pk != 0:
+                response_body = retrieve_user(pk)
+            else:
+                response_body = list_users(url)
+
+        if requested_resource == "categories":
+            if pk != 0:
+                response_body = retrieve_category(pk)
+            else:
+                response_body = list_categories()
+
+        if requested_resource == "tags":
+            response_body = list_tags()
+
+
+        if requested_resource == "posts":
             if url["pk"] != 0:
-                response_body = retrieve_user(url["pk"])
-                return self.response(response_body, status.HTTP_200_SUCCESS.value)
-            
-            response_body = list_users()
+                response_body = postDetails(url["pk"])
+            else: 
+                response_body = filteredAllPosts(url)
+
+        if requested_resource == "post_tags":
+            if pk != 0:
+                response_body = retrieve_post_tag(pk)
+            else:
+                response_body = list_post_tags(url)
+
+        if response_body == 'id not found':
+            return self.response("", status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA.value)
+        if response_body:
             return self.response(response_body, status.HTTP_200_SUCCESS.value)
         
-        else:
-            return self.response("",status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
+        return self.response("",status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
+
 
     def do_POST(self):
 
         url = self.parse_url(self.path)
+        request_body = self.parse_request_body()
+        requested_resource = url["requested_resource"]
+        response_body=""
 
-        request_body = JSONServer.parse_request_body(self)
-
-        if url['requested_resource'] == 'users':
-
+        # JSON.dumps() is being invoked in each function
+        if requested_resource == 'login':
+            response_body = login_user(request_body)
+            return self.response(response_body, status.HTTP_200_SUCCESS.value)
+        if requested_resource == 'users':
             response_body = create_user(request_body)
 
+        if requested_resource == 'categories':
+            response_body = create_category(request_body)
+            
+        if requested_resource == 'posts':
+            response_body = create_post(request_body)
+
+        if requested_resource == 'tags':
+            response_body = create_tag(request_body)
+
+        if requested_resource == 'post_tags':
+            response_body = create_post_tag(request_body)
+
+        if response_body:
             return self.response(response_body, status.HTTP_201_SUCCESS_CREATED.value)
-        
-        if url['requested_resource'] == 'login':
 
-            response_body = login_user(request_body)
+        return self.response("Not found", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
 
-            return self.response(response_body, status.HTTP_200_SUCCESS.value)
-
-
+    
     def do_DELETE(self):
-        pass
+        url=self.parse_url(self.path)
+        requested_resource = url["requested_resource"]
+        pk =url["pk"]
+        succesfully_deleted = False
+
+        if requested_resource =='users':
+            if pk:
+                succesfully_deleted = delete_user(pk)
+
+        if requested_resource =='categories':
+            if pk:
+                succesfully_deleted = delete_category(pk)
+
+        if url["requested_resource"]=='tags':
+            if pk:
+                succesfully_deleted = delete_tag(pk)
+
+        if url["requested_resource"]=='post_tags':
+            if pk:
+                succesfully_deleted = delete_post_tag(pk)
+
+        if succesfully_deleted:
+            return self.response("",status.HTTP_204_SUCCESS_NO_RESPONSE_BODY.value)
+
+        return self.response("requested resource not found", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
+
 
     def do_PUT(self):
         url = self.parse_url(self.path)
-        content_len = int(self.headers.get('content-length', 0))
-        request_body = self.rfile.read(content_len)
-        request_body = json.loads(request_body)
-        resource_type = url["requested_resource"]
+        request_body = self.parse_request_body()
+        requested_resource = url["requested_resource"]
         pk = url["pk"]
+        response_body = ""
 
-        if resource_type in ["users", "posts", "tags", "comments"]:
+        if requested_resource == "users":
             if pk != 0:
-                response_body = self.update_resource(resource_type, pk, request_body)
-                if response_body:
-                    return self.response("", status.HTTP_204_SUCCESS_NO_RESPONSE_BODY.value)
-            return self.response("Request resource not found", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
+                response_body = update_user(pk, request_body)
+
+        if requested_resource == "categories":
+            if pk != 0:
+                response_body = update_category(pk, request_body)
+
+        if requested_resource == "tags":
+            if pk != 0:
+                response_body = update_tag(pk, request_body)
+
+        if requested_resource == "post_tags":
+            if pk != 0:
+                response_body = update_post_tag(pk, request_body)
+
+        if response_body:
+            return self.response(response_body, status.HTTP_201_SUCCESS_CREATED.value)
+
         return self.response("Not found", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
 
-    def update_resource(self, resource_type, pk, request_body):
-        if resource_type == "users":
-            return update_user(pk, request_body)
-        elif resource_type == "posts":
-            return False  # Replace with update_posts
-        elif resource_type == "tag":
-            return False  # Replace with update_tags
-        elif resource_type == "comment":
-            return False  # Replace with update_comment
-        else:
-            return False  # Resource type not supported
 
 
-
-
-
+  
 
 # ----------------------------------------------
 def main():
@@ -89,3 +157,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
