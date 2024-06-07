@@ -37,22 +37,25 @@ def filteredAllPosts(url):
         
         query_results = db_cursor.fetchall()
 
-        posts=[]
+        posts = []
         for row in query_results:
             post = {
-                "id": row['id'],
-                "user_id": row['user_id'],
+                "id": row["id"],
+                "user_id": row["user_id"],
                 "title": row['title'],
                 "publication_date": row['publication_date'],
                 "author": f"{row['first_name']} {row['last_name']}",
-                "category_name": row['label']
+                "category_name": row['label'],
             }
-            db_cursor.execute("""
+            db_cursor.execute(
+                """
             SELECT t.label
             FROM Tags t
             JOIN PostTags pt ON t.id = pt.tag_id
             WHERE pt.post_id = ?
-            """, (row['id'],))
+            """,
+                (row["id"],),
+            )
             tag_results = db_cursor.fetchall()
             tags = [tag['label'] for tag in tag_results]
 
@@ -111,3 +114,50 @@ def postDetails(pk):
 
         serialized_post = json.dumps(dict(post))
         return serialized_post
+    
+def create_post(post_request_body):
+    with sqlite3.connect("./db.sqlite3") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+
+        # Corrected SQL query
+        db_cursor.execute(
+            """
+        INSERT INTO Posts (
+            user_id,
+            category_id,
+            title,
+            publication_date,
+            image_url,
+            content,
+            approved
+        ) 
+        VALUES (?,?,?,?,?,?,?)
+            """,
+            (
+                post_request_body["user_id"],  # Assuming user_id is passed in the request body
+                post_request_body["category_id"],
+                post_request_body["title"],
+                post_request_body["publication_date"],
+                post_request_body["image_url"],
+                post_request_body["content"],
+                post_request_body["approved"],
+            ),
+        )
+
+        id = db_cursor.lastrowid
+        # Corrected response body construction
+        response_body = {
+            "id": id,
+            "user_id": post_request_body["user_id"],
+            "category_id": post_request_body["category_id"],
+            "title": post_request_body["title"],
+            "publication_date": post_request_body["publication_date"],
+            "image_url": post_request_body["image_url"],
+            "content": post_request_body["content"],
+            "approved": post_request_body["approved"]
+        }
+
+        print(post_request_body)
+        return json.dumps(response_body)
+
