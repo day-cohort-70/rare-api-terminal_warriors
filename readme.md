@@ -20,8 +20,6 @@ Brief description of the project and its purpose.
 
 - [Installation](#installation)
 - [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Installation
 
@@ -30,11 +28,3 @@ Instructions on how to install and set up the project locally.
 ## Usage
 
 Instructions and examples on how to use the project.
-
-## Contributing
-
-Guidelines for contributing to the project, including code of conduct and contribution process.
-
-## License
-
-This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
