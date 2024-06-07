@@ -11,7 +11,7 @@ def filteredAllPosts(url):
         query_string = """
         SELECT
             p.id,
-            p.post_id,
+            p.user_id,
             p.title,
             p.publication_date,
             p.category_id,
@@ -19,8 +19,8 @@ def filteredAllPosts(url):
             u.first_name,
             u.last_name
         FROM Posts p
-        JOIN Posts u
-            ON p.post_id = u.id
+        JOIN Users u
+            ON p.user_id = u.id
         LEFT JOIN Categories c
             ON p.category_id = c.id
         """
@@ -41,11 +41,11 @@ def filteredAllPosts(url):
         for row in query_results:
             post = {
                 "id": row["id"],
-                "post_id": row["post_id"],
-                "title": row["title"],
-                "publication_date": row["publication_date"],
+                "user_id": row["user_id"],
+                "title": row['title'],
+                "publication_date": row['publication_date'],
                 "author": f"{row['first_name']} {row['last_name']}",
-                "category_name": row["label"],
+                "category_name": row['label'],
             }
             db_cursor.execute(
                 """
@@ -57,7 +57,7 @@ def filteredAllPosts(url):
                 (row["id"],),
             )
             tag_results = db_cursor.fetchall()
-            tags = [tag["label"] for tag in tag_results]
+            tags = [tag['label'] for tag in tag_results]
 
             post["tags"] = tags
             posts.append(post)
@@ -67,8 +67,6 @@ def filteredAllPosts(url):
     return serialized_posts
 
 
-import sqlite3
-import json
 
 def create_post(post_request_body):
     with sqlite3.connect("./db.sqlite3") as conn:

@@ -5,7 +5,7 @@ from nss_handler import HandleRequests, status
 
 from views import list_users,retrieve_user, create_user,login_user, update_user, delete_user
 from views import list_categories, retrieve_category, create_category,delete_category, update_category
-from views import filteredAllPosts
+from views import filteredAllPosts, create_post
 from views import create_tag, list_tags,delete_tag,update_tag
 from views import list_post_tags, retrieve_post_tag, create_post_tag, delete_post_tag, update_post_tag
 
@@ -70,7 +70,7 @@ class JSONServer(HandleRequests):
         if requested_resource == 'categories':
             response_body = create_category(request_body)
             
-        if requested_resource == 'post':
+        if requested_resource == 'posts':
             response_body = create_post(request_body)
 
         if requested_resource == 'tags':
