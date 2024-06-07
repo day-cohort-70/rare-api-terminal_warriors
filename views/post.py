@@ -66,8 +66,55 @@ def filteredAllPosts(url):
 
     return serialized_posts
 
+def postDetails(pk):
+    with sqlite3.connect("./db.sqlite3") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
 
+        db_cursor.execute("""
+        SELECT
+            p.id,
+            p.user_id,
+            p.title,
+            p.publication_date,
+            p.category_id,
+            p.image_url,
+            p.content,
+            c.label,
+            u.first_name,
+            u.last_name
+        FROM Posts p
+        JOIN Users u
+            ON p.user_id = u.id
+        LEFT JOIN Categories c
+            ON p.category_id = c.id
+        WHERE p.id = ?
+        """, (pk,))
+        query_results = db_cursor.fetchone()
 
+        post = {
+                "id": query_results['id'],
+                "user_id": query_results['user_id'],
+                "title": query_results['title'],
+                "publication_date": query_results['publication_date'],
+                "author": f"{query_results['first_name']} {query_results['last_name']}",
+                "category_name": query_results['label'],
+                "image_url": query_results['image_url'],
+                "content": query_results['content']
+            }
+        db_cursor.execute("""
+        SELECT t.label
+        FROM Tags t
+        JOIN PostTags pt ON t.id = pt.tag_id
+        WHERE pt.post_id = ?
+        """, (query_results['id'],))
+        tag_results = db_cursor.fetchall()
+        tags = [tag['label'] for tag in tag_results]
+        post["tags"] = tags
+
+        serialized_post = json.dumps(dict(post))
+        return serialized_post
+    
 def create_post(post_request_body):
     with sqlite3.connect("./db.sqlite3") as conn:
         conn.row_factory = sqlite3.Row
