@@ -46,7 +46,7 @@ This is the backend server for the Rare publishing platform, built using Python 
     ```
   The server will start on `http://localhost:8000`.
 
-- **API Endpoints**:
+-###  **API Endpoints**:
  ```
   - **Users**:
   - **Categories**:
@@ -54,7 +54,6 @@ This is the backend server for the Rare publishing platform, built using Python 
   - **Tags**:
   - **Post Tags**:
   - **Authentication**:
-    - `POST /login` - User login
 ```
 ### Contributing
 
